@@ -14,67 +14,78 @@ func (g *Group) Group(path string) *Group {
 	return g.router.Group(g.prefix + path)
 }
 
+func (g *Group) Middleware(handler MiddlewareHandler) {
+	g.beforeHandler = handler
+}
+
+func (g *Group) getHandler(handler fasthttp.RequestHandler) fasthttp.RequestHandler {
+	if g.beforeHandler != nil {
+		return g.beforeHandler(handler)
+	}
+	return handler
+}
+
 // GET is a shortcut for group.Handle(fasthttp.MethodGet, path, handler)
 func (g *Group) GET(path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.GET(g.prefix+path, handler)
+	g.router.GET(g.prefix+path, g.getHandler(handler))
 }
 
 // HEAD is a shortcut for group.Handle(fasthttp.MethodHead, path, handler)
 func (g *Group) HEAD(path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.HEAD(g.prefix+path, handler)
+	g.router.HEAD(g.prefix+path, g.getHandler(handler))
 }
 
 // POST is a shortcut for group.Handle(fasthttp.MethodPost, path, handler)
 func (g *Group) POST(path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.POST(g.prefix+path, handler)
+	g.router.POST(g.prefix+path, g.getHandler(handler))
 }
 
 // PUT is a shortcut for group.Handle(fasthttp.MethodPut, path, handler)
 func (g *Group) PUT(path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.PUT(g.prefix+path, handler)
+	g.router.PUT(g.prefix+path, g.getHandler(handler))
 }
 
 // PATCH is a shortcut for group.Handle(fasthttp.MethodPatch, path, handler)
 func (g *Group) PATCH(path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.PATCH(g.prefix+path, handler)
+	g.router.PATCH(g.prefix+path, g.getHandler(handler))
 }
 
 // DELETE is a shortcut for group.Handle(fasthttp.MethodDelete, path, handler)
 func (g *Group) DELETE(path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.DELETE(g.prefix+path, handler)
+	g.router.DELETE(g.prefix+path, g.getHandler(handler))
 }
 
 // OPTIONS is a shortcut for group.Handle(fasthttp.MethodOptions, path, handler)
 func (g *Group) CONNECT(path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.CONNECT(g.prefix+path, handler)
+	g.router.CONNECT(g.prefix+path, g.getHandler(handler))
 }
 
 // OPTIONS is a shortcut for group.Handle(fasthttp.MethodOptions, path, handler)
 func (g *Group) OPTIONS(path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.OPTIONS(g.prefix+path, handler)
+	g.router.OPTIONS(g.prefix+path, g.getHandler(handler))
 }
 
 // OPTIONS is a shortcut for group.Handle(fasthttp.MethodOptions, path, handler)
 func (g *Group) TRACE(path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.TRACE(g.prefix+path, handler)
+	g.router.TRACE(g.prefix+path, g.getHandler(handler))
 }
 
 // ANY is a shortcut for group.Handle(router.MethodWild, path, handler)
@@ -83,7 +94,7 @@ func (g *Group) TRACE(path string, handler fasthttp.RequestHandler) {
 func (g *Group) ANY(path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.ANY(g.prefix+path, handler)
+	g.router.ANY(g.prefix+path, g.getHandler(handler))
 }
 
 // ServeFiles serves files from the given file system root.
@@ -128,5 +139,5 @@ func (g *Group) ServeFilesCustom(path string, fs *fasthttp.FS) {
 func (g *Group) Handle(method, path string, handler fasthttp.RequestHandler) {
 	validatePath(path)
 
-	g.router.Handle(method, g.prefix+path, handler)
+	g.router.Handle(method, g.prefix+path, g.getHandler(handler))
 }

@@ -5,8 +5,11 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+type MiddlewareHandler func(handler fasthttp.RequestHandler) fasthttp.RequestHandler
+
 // Router is a fasthttp.RequestHandler which can be used to dispatch requests to different
 // handler functions via configurable routes
+
 type Router struct {
 	trees              []*radix.Tree
 	treeMutable        bool
@@ -79,6 +82,7 @@ type Router struct {
 
 // Group is a sub-router to group paths
 type Group struct {
-	router *Router
-	prefix string
+	router        *Router
+	prefix        string
+	beforeHandler MiddlewareHandler
 }
